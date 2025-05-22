@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import styles from './register.module.css';
 
 type FormData = {
@@ -18,7 +19,8 @@ type FormData = {
 export default function Register() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const role = searchParams.get('role');
+  const role = searchParams.get('role') as 'visitor' | 'librarian';
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -41,10 +43,21 @@ export default function Register() {
     }
     
     setPasswordError('');
-    // Здесь будет логика отправки данных на сервер
-    console.log('Form data:', formData);
-    // После успешной регистрации можно перенаправить пользователя
-    // router.push('/login');
+
+    // Создаем объект пользователя
+    const userData = {
+      id: Date.now().toString(), // В реальном приложении ID будет генерироваться на сервере
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      role: role,
+    };
+
+    // Сохраняем пользователя в контекст
+    login(userData);
+
+    // Перенаправляем на страницу каталога
+    router.push('/catalog');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
