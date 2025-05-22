@@ -163,6 +163,186 @@
   font-size: 1.1rem;
 }
 
+.profileLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: #333;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.profileLink:hover {
+  background-color: #f0f0f0;
+}
+
+.userName {
+  font-weight: 500;
+}
+
+.profileIcon {
+  font-size: 1.2rem;
+}
+
+.ratingContainer {
+  margin: 1rem 0;
+}
+
+.stars {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.starButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #ddd;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.starButton:hover {
+  color: #ffd700;
+}
+
+.starButton.active {
+  color: #ffd700;
+}
+
+.ratingInfo {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.reviewSection {
+  margin: 1.5rem 0;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.reviewSection h4 {
+  margin: 0 0 1rem;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.review {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.reviewAuthor {
+  font-weight: 500;
+  color: #333;
+}
+
+.reviewDate {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.reviewText {
+  margin: 0;
+  color: #444;
+  line-height: 1.5;
+}
+
+.addReviewButton {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  color: #333;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.addReviewButton:hover {
+  background: #e0e0e0;
+}
+
+.reviewForm {
+  margin-top: 1rem;
+}
+
+.reviewTextarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  resize: vertical;
+  margin-bottom: 0.5rem;
+}
+
+.reviewFormFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wordCount {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.reviewFormButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cancelButton,
+.submitButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancelButton {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.cancelButton:hover {
+  background: #e0e0e0;
+}
+
+.submitButton {
+  background: #0070f3;
+  color: white;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #0060df;
+}
+
+.submitButton:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .container {
