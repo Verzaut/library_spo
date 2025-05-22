@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Navigation from '../components/Navigation';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
 import styles from './profile.module.css';
@@ -79,7 +78,6 @@ export default function Profile() {
 
   return (
     <ProtectedRoute>
-      <Navigation />
       <div className={styles.container}>
         <header className={styles.header}>
           <h1>Профиль читателя</h1>

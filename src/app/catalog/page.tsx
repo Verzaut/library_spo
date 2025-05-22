@@ -1,7 +1,7 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
-import Navigation from '../components/Navigation';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
 import styles from './catalog.module.css';
@@ -68,7 +68,146 @@ const mockBooks: Book[] = [
     averageRating: 9.0,
     reviews: []
   },
-  // Добавьте больше книг по необходимости
+  {
+    id: '3',
+    title: 'Мастер и Маргарита',
+    author: 'Михаил Булгаков',
+    year: 1967,
+    genre: 'Фантастика',
+    available: true,
+    coverUrl: '/book-covers/master-and-margarita.jpg',
+    description: 'Мистический роман о визите дьявола в Москву и параллельной истории Понтия Пилата.',
+    rating: null,
+    totalRatings: 20,
+    averageRating: 9.5,
+    reviews: []
+  },
+  {
+    id: '4',
+    title: '1984',
+    author: 'Джордж Оруэлл',
+    year: 1949,
+    genre: 'Антиутопия',
+    available: true,
+    coverUrl: '/book-covers/1984.jpg',
+    description: 'Культовый роман-антиутопия о тоталитарном обществе будущего.',
+    rating: null,
+    totalRatings: 18,
+    averageRating: 9.2,
+    reviews: []
+  },
+  {
+    id: '5',
+    title: 'Гарри Поттер и философский камень',
+    author: 'Джоан Роулинг',
+    year: 1997,
+    genre: 'Фэнтези',
+    available: true,
+    coverUrl: '/book-covers/harry-potter.jpg',
+    description: 'Первая книга о приключениях юного волшебника Гарри Поттера.',
+    rating: null,
+    totalRatings: 25,
+    averageRating: 8.8,
+    reviews: []
+  },
+  {
+    id: '6',
+    title: 'Три товарища',
+    author: 'Эрих Мария Ремарк',
+    year: 1936,
+    genre: 'Роман',
+    available: true,
+    coverUrl: '/book-covers/three-comrades.jpg',
+    description: 'История о дружбе, любви и жизни в послевоенной Германии.',
+    rating: null,
+    totalRatings: 14,
+    averageRating: 9.1,
+    reviews: []
+  },
+  {
+    id: '7',
+    title: 'Сто лет одиночества',
+    author: 'Габриэль Гарсиа Маркес',
+    year: 1967,
+    genre: 'Магический реализм',
+    available: true,
+    coverUrl: '/book-covers/hundred-years.jpg',
+    description: 'Эпическая сага о семье Буэндиа и городе Макондо.',
+    rating: null,
+    totalRatings: 16,
+    averageRating: 8.9,
+    reviews: []
+  },
+  {
+    id: '8',
+    title: 'Маленький принц',
+    author: 'Антуан де Сент-Экзюпери',
+    year: 1943,
+    genre: 'Философская сказка',
+    available: true,
+    coverUrl: '/book-covers/little-prince.jpg',
+    description: 'Философская сказка о любви, дружбе и смысле жизни.',
+    rating: null,
+    totalRatings: 22,
+    averageRating: 9.3,
+    reviews: []
+  },
+  {
+    id: '9',
+    title: 'Анна Каренина',
+    author: 'Лев Толстой',
+    year: 1877,
+    genre: 'Роман',
+    available: true,
+    coverUrl: '/book-covers/anna-karenina.jpg',
+    description: 'История о трагической любви замужней дамы в контексте норм высшего общества.',
+    rating: null,
+    totalRatings: 17,
+    averageRating: 8.7,
+    reviews: []
+  },
+  {
+    id: '10',
+    title: 'Властелин колец: Братство кольца',
+    author: 'Джон Р. Р. Толкин',
+    year: 1954,
+    genre: 'Фэнтези',
+    available: true,
+    coverUrl: '/book-covers/lotr.jpg',
+    description: 'Первая часть эпической трилогии о приключениях хоббита Фродо.',
+    rating: null,
+    totalRatings: 24,
+    averageRating: 9.4,
+    reviews: []
+  },
+  {
+    id: '11',
+    title: 'Портрет Дориана Грея',
+    author: 'Оскар Уайльд',
+    year: 1890,
+    genre: 'Готический роман',
+    available: true,
+    coverUrl: '/book-covers/dorian-gray.jpg',
+    description: 'История о молодом человеке, чей портрет старел вместо него.',
+    rating: null,
+    totalRatings: 19,
+    averageRating: 8.6,
+    reviews: []
+  },
+  {
+    id: '12',
+    title: 'Гордость и предубеждение',
+    author: 'Джейн Остин',
+    year: 1813,
+    genre: 'Роман',
+    available: true,
+    coverUrl: '/book-covers/pride-prejudice.jpg',
+    description: 'Романтическая история о преодолении классовых предрассудков.',
+    rating: null,
+    totalRatings: 21,
+    averageRating: 8.9,
+    reviews: []
+  }
 ];
 
 // Компонент для отображения отзывов
@@ -162,7 +301,7 @@ const ReviewSection = ({ book, onAddReview }: { book: Book; onAddReview: (text: 
 };
 
 export default function Catalog() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [books, setBooks] = useState<Book[]>(mockBooks);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('all');
@@ -255,9 +394,22 @@ export default function Catalog() {
 
   return (
     <ProtectedRoute>
-      <Navigation />
       <div className={styles.container}>
         <header className={styles.header}>
+          <div className={styles.headerContent}>
+            <h1>Каталог книг</h1>
+            <div className={styles.userInfo}>
+              <Link href="/profile" className={styles.profileLink}>
+                <span className={styles.userName}>
+                  {user?.firstName} {user?.lastName}
+                </span>
+                <span className={styles.profileIcon}>👤</span>
+              </Link>
+              <button onClick={logout} className={styles.logoutButton}>
+                Выйти
+              </button>
+            </div>
+          </div>
           <div className={styles.filters}>
             <input
               type="text"

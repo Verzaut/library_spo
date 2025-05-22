@@ -1,17 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
+import Navigation from './components/Navigation';
+import { AuthProvider } from './context/AuthContext';
 import "./globals.css";
-import ClientProvider from './providers/ClientProvider';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
 export const metadata: Metadata = {
   title: "Библиотека",
@@ -20,15 +13,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="ru">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ClientProvider>
-          {children}
-        </ClientProvider>
+      <body className={inter.className}>
+        <AuthProvider>
+          <div className="layout">
+            <Navigation />
+            <main className="main-content">
+              {children}
+            </main>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

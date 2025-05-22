@@ -9,53 +9,38 @@ export default function Navigation() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  // Если пользователь не авторизован, показываем только логотип
-  if (!user) {
-    return (
-      <nav className={styles.navigation}>
-        <Link href="/" className={styles.logo}>
-          📚 Библиотека
-        </Link>
-      </nav>
-    );
-  }
+  // Определяем, куда ведет ссылка логотипа
+  const homeLink = user ? '/catalog' : '/';
 
   return (
-    <nav className={styles.navigation}>
-      <div className={styles.leftSection}>
-        <Link href="/" className={styles.logo}>
-          📚 Библиотека
+    <nav className={styles.nav}>
+      <div className={styles.container}>
+        <Link href={homeLink} className={styles.logo}>
+          Библиотека
         </Link>
-        <div className={styles.navLinks}>
-          <Link 
-            href="/catalog" 
-            className={`${styles.navLink} ${pathname === '/catalog' ? styles.active : ''}`}
-          >
-            Каталог
-          </Link>
-          <Link 
-            href="/profile" 
-            className={`${styles.navLink} ${pathname === '/profile' ? styles.active : ''}`}
-          >
-            Мой профиль
-          </Link>
-          {user.role === 'librarian' && (
-            <Link 
-              href="/admin" 
-              className={`${styles.navLink} ${pathname === '/admin' ? styles.active : ''}`}
+        
+        {user && (
+          <div className={styles.links}>
+            <Link
+              href="/catalog"
+              className={`${styles.link} ${pathname === '/catalog' ? styles.activeLink : ''}`}
             >
-              Управление
+              Каталог
             </Link>
-          )}
-        </div>
-      </div>
-      <div className={styles.rightSection}>
-        <span className={styles.userName}>
-          {user.firstName} {user.lastName}
-        </span>
-        <button onClick={logout} className={styles.logoutButton}>
-          Выйти
-        </button>
+            <Link
+              href="/profile"
+              className={`${styles.link} ${pathname === '/profile' ? styles.activeLink : ''}`}
+            >
+              Профиль
+            </Link>
+            <button 
+              onClick={logout} 
+              className={`${styles.link} ${styles.logoutButton}`}
+            >
+              Выйти
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );
