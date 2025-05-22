@@ -1,0 +1,172 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+}
+
+/* Шапка */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.logo h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Основной контент */
+.hero {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: #e3f2fd;
+}
+
+.hero h2 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+/* Секция с книгами */
+.booksSection {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.booksGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+/* Карточка книги */
+.bookCard, .addBookCard {
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.bookCard:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.bookPlaceholder {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Кнопка добавления */
+.addBookCard {
+  cursor: pointer;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.addBookCard:hover {
+  background-color: #e0e0e0;
+}
+
+.plusIcon {
+  font-size: 3rem;
+  line-height: 1;
+  color: #666;
+}
+
+/* Подвал */
+.footer {
+  text-align: center;
+  padding: 1.5rem;
+  background: white;
+  color: #666;
+  border-top: 1px solid #eaeaea;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.roleSelection {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.roleCard {
+  width: 280px;
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.roleCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.iconWrapper {
+  background: #f0f0f0;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.icon {
+  font-size: 2.5rem;
+}
+
+.roleCard h2 {
+  margin: 0.5rem 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.roleCard p {
+  color: #666;
+  margin: 0;
+}
