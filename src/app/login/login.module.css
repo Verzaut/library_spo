@@ -29,6 +29,13 @@
   text-align: center;
 }
 
+.subtitle {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -110,4 +117,30 @@
   .title {
     font-size: 1.5rem;
   }
+}
+
+.passwordContainer {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.passwordToggleLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 0.5rem;
+}
+
+.passwordToggleCheckbox {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
 } 

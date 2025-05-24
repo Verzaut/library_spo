@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { libraries } from '../data/libraries';
 import styles from './register.module.css';
 
 type FormData = {
@@ -19,8 +20,16 @@ type FormData = {
 export default function Register() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const role = searchParams.get('role') as 'visitor' | 'librarian';
+  const libraryId = searchParams.get('library');
   const { login } = useAuth();
+
+  const selectedLibrary = libraries.find(lib => lib.id === libraryId);
+
+  useEffect(() => {
+    if (!libraryId || !selectedLibrary) {
+      router.push('/');
+    }
+  }, [libraryId, selectedLibrary, router]);
 
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -33,6 +42,8 @@ export default function Register() {
   });
 
   const [passwordError, setPasswordError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -46,11 +57,12 @@ export default function Register() {
 
     // Создаем объект пользователя
     const userData = {
-      id: Date.now().toString(), // В реальном приложении ID будет генерироваться на сервере
+      id: Date.now().toString(),
       firstName: formData.firstName,
       lastName: formData.lastName,
       email: formData.email,
-      role: role,
+      role: 'visitor' as const,
+      libraryId: libraryId as string,
     };
 
     // Сохраняем пользователя в контекст
@@ -67,19 +79,33 @@ export default function Register() {
       [name]: value
     }));
     
-    // Сбрасываем ошибку при изменении любого из паролей
     if (name === 'password' || name === 'confirmPassword') {
       setPasswordError('');
     }
   };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  if (!selectedLibrary) {
+    return null;
+  }
 
   return (
     <div className={styles.container}>
       <main className={styles.main}>
         <div className={styles.formWrapper}>
           <h1 className={styles.title}>
-            {role === 'visitor' ? 'Регистрация посетителя' : 'Регистрация библиотекаря'}
+            Регистрация в библиотеке
           </h1>
+          <h2 className={styles.subtitle}>
+            {selectedLibrary.name}
+          </h2>
           
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.inputGroup}>
@@ -151,30 +177,52 @@ export default function Register() {
 
             <div className={styles.inputGroup}>
               <label htmlFor="password">Пароль</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                minLength={6}
-                placeholder="Минимум 6 символов"
-              />
+              <div className={styles.passwordContainer}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  minLength={6}
+                  placeholder="Минимум 6 символов"
+                />
+              </div>
+              <label className={styles.passwordToggleLabel}>
+                <input
+                  type="checkbox"
+                  className={styles.passwordToggleCheckbox}
+                  checked={showPassword}
+                  onChange={togglePasswordVisibility}
+                />
+                Показать пароль
+              </label>
             </div>
 
             <div className={styles.inputGroup}>
               <label htmlFor="confirmPassword">Подтверждение пароля</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                minLength={6}
-                placeholder="Повторите пароль"
-              />
+              <div className={styles.passwordContainer}>
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  minLength={6}
+                  placeholder="Повторите пароль"
+                />
+              </div>
+              <label className={styles.passwordToggleLabel}>
+                <input
+                  type="checkbox"
+                  className={styles.passwordToggleCheckbox}
+                  checked={showConfirmPassword}
+                  onChange={toggleConfirmPasswordVisibility}
+                />
+                Показать пароль
+              </label>
               {passwordError && (
                 <span className={styles.errorText}>{passwordError}</span>
               )}
@@ -186,7 +234,7 @@ export default function Register() {
 
             <div className={styles.loginLink}>
               Уже есть аккаунт?{' '}
-              <Link href={`/login?role=${role}`}>
+              <Link href={`/login?library=${libraryId}`}>
                 Войти
               </Link>
             </div>

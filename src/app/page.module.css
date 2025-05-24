@@ -1,201 +1,91 @@
 .container {
   min-height: 100vh;
-  padding: 4rem 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Шапка */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
   background-color: #f5f5f5;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.logo h1 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-.nav {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.nav a {
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-}
-
-/* Основной контент */
-.hero {
-  text-align: center;
-  padding: 3rem 1rem;
-  background-color: #e3f2fd;
-}
-
-.hero h2 {
-  margin: 0;
-  font-size: 2rem;
-}
-
-/* Секция с книгами */
-.booksSection {
   padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.booksGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-/* Карточка книги */
-.bookCard, .addBookCard {
-  border: 1px dashed #ccc;
-  border-radius: 8px;
-  padding: 1rem;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.bookCard:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.bookPlaceholder {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
-}
-
-/* Кнопка добавления */
-.addBookCard {
-  cursor: pointer;
-  background-color: #f5f5f5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-}
-
-.addBookCard:hover {
-  background-color: #e0e0e0;
-}
-
-.plusIcon {
-  font-size: 3rem;
-  line-height: 1;
-  color: #666;
 }
 
 .main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: var(--max-width);
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
   width: 100%;
 }
 
 .title {
-  font-size: 2.5rem;
-  text-align: center;
-  margin-bottom: 3rem;
+  font-size: 2rem;
   color: #333;
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
-.roleSelection {
-  display: flex;
+.librariesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  width: 100%;
-  max-width: 800px;
+  padding: 1rem;
 }
 
-.roleCard {
+.libraryCard {
   background: white;
   border-radius: 12px;
-  padding: 2rem;
-  width: 300px;
-  text-align: center;
-  text-decoration: none;
-  color: #333;
-  transition: transform 0.2s, box-shadow 0.2s;
+  padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
-.roleCard:hover {
+.libraryCard:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.iconWrapper {
-  background: #f0f0f0;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+.libraryName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.libraryInfo {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.libraryDetail {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
 }
 
 .icon {
-  font-size: 2.5rem;
-}
-
-.roleCard h2 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
-}
-
-.roleCard p {
-  margin: 0 0 1rem 0;
-  color: #666;
-}
-
-.note {
-  font-size: 0.9rem;
-  color: #666;
-  margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
-  width: 100%;
+  width: 20px;
+  color: #0070f3;
 }
 
 .footer {
-  width: 100%;
   text-align: center;
   padding: 2rem 0;
   color: #666;
 }
 
-/* Responsive styles */
 @media (max-width: 768px) {
   .container {
-    padding: 2rem 1rem;
+    padding: 1rem;
+  }
+
+  .librariesGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .title {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-  }
-
-  .roleCard {
-    width: 100%;
-    max-width: 300px;
+    font-size: 1.5rem;
   }
 }

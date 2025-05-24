@@ -9,38 +9,49 @@ export default function Navigation() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  // Определяем, куда ведет ссылка логотипа
-  const homeLink = user ? '/catalog' : '/';
+  const isActive = (path: string) => pathname === path;
 
   return (
     <nav className={styles.nav}>
       <div className={styles.container}>
-        <Link href={homeLink} className={styles.logo}>
+        <Link href="/" className={styles.logo}>
           Библиотека
         </Link>
-        
-        {user && (
-          <div className={styles.links}>
+
+        <div className={styles.links}>
+          {user ? (
+            <>
+              <Link
+                href="/catalog"
+                className={`${styles.link} ${isActive('/catalog') ? styles.activeLink : ''}`}
+              >
+                Каталог
+              </Link>
+              <Link
+                href="/profile"
+                className={`${styles.link} ${isActive('/profile') ? styles.activeLink : ''}`}
+              >
+                Профиль
+              </Link>
+              <Link
+                href="/"
+                className={`${styles.link} ${isActive('/') ? styles.activeLink : ''}`}
+              >
+                Выбор библиотеки
+              </Link>
+              <button onClick={logout} className={styles.logoutButton}>
+                Выйти
+              </button>
+            </>
+          ) : (
             <Link
-              href="/catalog"
-              className={`${styles.link} ${pathname === '/catalog' ? styles.activeLink : ''}`}
+              href="/"
+              className={`${styles.link} ${isActive('/') ? styles.activeLink : ''}`}
             >
-              Каталог
+              Выбор библиотеки
             </Link>
-            <Link
-              href="/profile"
-              className={`${styles.link} ${pathname === '/profile' ? styles.activeLink : ''}`}
-            >
-              Профиль
-            </Link>
-            <button 
-              onClick={logout} 
-              className={`${styles.link} ${styles.logoutButton}`}
-            >
-              Выйти
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </nav>
   );
