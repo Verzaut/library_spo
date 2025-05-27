@@ -4,7 +4,7 @@ import AddBookForm from '@/app/components/AddBookForm';
 import { useAuth } from '@/app/context/AuthContext';
 import { bookService } from '@/app/services/bookService';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styles from './page.module.css';
 
 type BookActivity = {
@@ -23,6 +23,8 @@ export default function LibrarianDashboard() {
   const [recentActivities, setRecentActivities] = useState<BookActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [books, setBooks] = useState<Array<{ id: string; title: string; author: string }>>([]);
+  const [bookToDelete, setBookToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -55,26 +57,54 @@ export default function LibrarianDashboard() {
     };
   }, [user, router]);
 
-  // Если идет загрузка, показываем индикатор загрузки
-  if (isLoading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loading}>Загрузка...</div>
-      </div>
-    );
-  }
+  const handleDeleteClick = useCallback((bookId: string, bookTitle: string) => {
+    setBookToDelete({ id: bookId, title: bookTitle });
+    setIsModalOpen(true);
+  }, []);
 
-  // Если пользователь не авторизован или не является библиотекарем, не показываем содержимое
-  if (!user || user.role !== 'librarian') {
-    return null;
-  }
+  const handleConfirmDelete = useCallback(async () => {
+    if (!bookToDelete) return;
 
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-  };
+    try {
+      const success = bookService.deleteBook(bookToDelete.id);
+      if (success) {
+        setBooks(prevBooks => prevBooks.filter(book => book.id !== bookToDelete.id));
+        setTotalBooks(prev => prev - 1);
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('ru-RU', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        
+        const deletedBook = books.find(book => book.id === bookToDelete.id);
+        if (deletedBook) {
+          const newActivity: BookActivity = {
+            id: `delete-${bookToDelete.id}`,
+            time: timeString,
+            bookTitle: deletedBook.title,
+            author: deletedBook.author,
+            type: 'delete'
+          };
 
-  const handleAddBook = (bookData: {
+          setRecentActivities(prev => [newActivity, ...prev].slice(0, 5));
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting book:', error);
+      alert('Произошла ошибка при удалении книги');
+    } finally {
+      setIsModalOpen(false);
+      setBookToDelete(null);
+    }
+  }, [bookToDelete, books]);
+
+  const handleCancelDelete = useCallback(() => {
+    setIsModalOpen(false);
+    setBookToDelete(null);
+  }, []);
+
+  const handleAddBook = useCallback((bookData: {
     title: string;
     author: string;
     year: number;
@@ -84,6 +114,7 @@ export default function LibrarianDashboard() {
     try {
       const newBook = bookService.addBook(bookData);
       if (newBook) {
+        setBooks(prev => [...prev, newBook]);
         setTotalBooks(prev => prev + 1);
         
         const now = new Date();
@@ -96,52 +127,30 @@ export default function LibrarianDashboard() {
           id: newBook.id,
           time: timeString,
           bookTitle: bookData.title,
-          author: bookData.author
+          author: bookData.author,
+          type: 'add'
         };
 
         setRecentActivities(prev => [newActivity, ...prev].slice(0, 5));
         setShowAddBookForm(false);
-        alert('Книга успешно добавлена!');
       }
     } catch (error) {
       console.error('Error adding book:', error);
       alert('Произошла ошибка при добавлении книги');
     }
-  };
+  }, []);
 
-  const handleDeleteBook = (bookId: string) => {
-    try {
-      const success = bookService.deleteBook(bookId);
-      if (success) {
-        setBooks(prevBooks => prevBooks.filter(book => book.id !== bookId));
-        setTotalBooks(prev => prev - 1);
-        
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('ru-RU', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        });
-        
-        const deletedBook = books.find(book => book.id === bookId);
-        if (deletedBook) {
-          const newActivity: BookActivity = {
-            id: `delete-${bookId}`,
-            time: timeString,
-            bookTitle: deletedBook.title,
-            author: deletedBook.author,
-            type: 'delete'
-          };
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>Загрузка...</div>
+      </div>
+    );
+  }
 
-          setRecentActivities(prev => [newActivity, ...prev].slice(0, 5));
-        }
-        
-        alert('Книга успешно удалена!');
-      }
-    } catch (error) {
-      console.error('Error deleting book:', error);
-      alert('Произошла ошибка при удалении книги');
-    }
-  };
+  if (!user || user.role !== 'librarian') {
+    return null;
+  }
 
   return (
     <div className={styles.container}>
@@ -149,7 +158,7 @@ export default function LibrarianDashboard() {
         <h1>Панель управления библиотекаря</h1>
         <div className={styles.userInfo}>
           <span>{user.firstName}</span>
-          <button onClick={handleLogout} className={styles.logoutButton}>
+          <button onClick={logout} className={styles.logoutButton}>
             Выйти
           </button>
         </div>
@@ -214,10 +223,9 @@ export default function LibrarianDashboard() {
                   </div>
                   <button
                     className={styles.deleteBookButton}
-                    onClick={() => handleDeleteBook(book.id)}
-                    title="Удалить книгу"
+                    onClick={() => handleDeleteClick(book.id, book.title)}
                   >
-                    ✕
+                    Удалить
                   </button>
                 </div>
               ))
@@ -235,6 +243,29 @@ export default function LibrarianDashboard() {
           onClose={() => setShowAddBookForm(false)}
           onSubmit={handleAddBook}
         />
+      )}
+
+      {isModalOpen && bookToDelete && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h3>Подтверждение удаления</h3>
+            <p>Вы действительно хотите удалить книгу "{bookToDelete.title}"?</p>
+            <div className={styles.modalButtons}>
+              <button 
+                className={`${styles.modalButton} ${styles.confirmButton}`}
+                onClick={handleConfirmDelete}
+              >
+                Да, удалить
+              </button>
+              <button 
+                className={`${styles.modalButton} ${styles.cancelButton}`}
+                onClick={handleCancelDelete}
+              >
+                Отмена
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

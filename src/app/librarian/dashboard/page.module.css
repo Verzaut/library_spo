@@ -201,26 +201,18 @@
 }
 
 .deleteBookButton {
-  width: 28px;
-  height: 28px;
-  padding: 0;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 50%;
+  border-radius: 4px;
   background-color: #dc3545;
   color: white;
   cursor: pointer;
-  transition: all 0.2s;
-  font-size: 16px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.7;
+  transition: background-color 0.2s;
+  font-size: 0.9rem;
 }
 
 .deleteBookButton:hover {
   background-color: #c82333;
-  opacity: 1;
 }
 
 .noBooks {
@@ -230,6 +222,73 @@
   background: #f8f9fa;
   border-radius: 8px;
   font-style: italic;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+}
+
+.modalContent h3 {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.modalContent p {
+  margin: 0 0 1.5rem;
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.modalButton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.confirmButton {
+  background-color: #dc3545;
+  color: white;
+}
+
+.confirmButton:hover {
+  background-color: #c82333;
+}
+
+.cancelButton {
+  background-color: #6c757d;
+  color: white;
+}
+
+.cancelButton:hover {
+  background-color: #5a6268;
 }
 
 @media (max-width: 768px) {
@@ -275,6 +334,20 @@
   }
 
   .deleteBookButton {
+    width: 100%;
+  }
+
+  .modalContent {
+    width: calc(100% - 2rem);
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .modalButtons {
+    flex-direction: column;
+  }
+
+  .modalButton {
     width: 100%;
   }
 } 
