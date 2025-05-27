@@ -49,7 +49,7 @@ export default function Profile() {
       case 'active':
         return 'Активно';
       case 'returned':
-        return 'Возвращено';
+        return 'Бронь снята';
       case 'overdue':
         return 'Просрочено';
       default:

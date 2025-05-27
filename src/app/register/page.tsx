@@ -17,13 +17,10 @@ type FormData = {
   confirmPassword: string;
 };
 
-type UserRole = 'visitor' | 'librarian';
-
 export default function Register() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const libraryId = searchParams.get('library');
-  const role = searchParams.get('role');
   const { login } = useAuth();
 
   const selectedLibrary = libraries.find(lib => lib.id === libraryId);
@@ -59,25 +56,20 @@ export default function Register() {
     setPasswordError('');
 
     // Создаем объект пользователя
-    const userRole: UserRole = role === 'librarian' ? 'librarian' : 'visitor';
     const userData = {
       id: Date.now().toString(),
       firstName: formData.firstName,
       lastName: formData.lastName,
       email: formData.email,
-      role: userRole,
+      role: 'visitor' as const,
       libraryId: libraryId as string,
     };
 
     // Сохраняем пользователя в контекст
     login(userData);
 
-    // Перенаправляем на соответствующую страницу в зависимости от роли
-    if (role === 'librarian') {
-      router.push(`/librarian/dashboard?library=${libraryId}`);
-    } else {
-      router.push(`/catalog?library=${libraryId}`);
-    }
+    // Перенаправляем на каталог
+    router.push(`/catalog?library=${libraryId}`);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +101,7 @@ export default function Register() {
       <main className={styles.main}>
         <div className={styles.formWrapper}>
           <h1 className={styles.title}>
-            Регистрация в библиотеке
+            Регистрация читателя
           </h1>
           <h2 className={styles.subtitle}>
             {selectedLibrary.name}

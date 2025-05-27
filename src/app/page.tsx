@@ -15,8 +15,8 @@ export default function Home() {
             <h2>Читатель</h2>
             <p>Поиск и бронирование книг, управление заказами</p>
           </Link>
-          
-          <Link href="/libraries?role=librarian" className={styles.roleCard}>
+
+          <Link href="/librarian/login" className={styles.roleCard}>
             <div className={styles.roleIcon}>👨‍💼</div>
             <h2>Библиотекарь</h2>
             <p>Управление библиотекой, каталогом и читателями</p>

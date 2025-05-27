@@ -8,21 +8,14 @@ import styles from './libraries.module.css';
 
 export default function Libraries() {
   const searchParams = useSearchParams();
-  const role = searchParams.get('role');
   const { user } = useAuth();
-
-  // Если пользователь уже авторизован, используем его роль
-  const effectiveRole = user ? user.role : role;
 
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-        <h1 className={styles.title}>Выберите библиотеку</h1>
-        {!user && (
-          <p className={styles.roleInfo}>
-            Вы входите как: <strong>{role === 'librarian' ? 'Библиотекарь' : 'Читатель'}</strong>
-          </p>
-        )}
+        <h1 className={styles.title}>
+          Выберите библиотеку
+        </h1>
         
         <div className={styles.librariesGrid}>
           {libraries.map(library => (
@@ -30,7 +23,7 @@ export default function Libraries() {
               key={library.id}
               href={user 
                 ? `/catalog?library=${library.id}`
-                : `/register?library=${library.id}&role=${effectiveRole}`}
+                : `/register?library=${library.id}`}
               className={styles.libraryCard}
             >
               <h2 className={styles.libraryName}>{library.name}</h2>
