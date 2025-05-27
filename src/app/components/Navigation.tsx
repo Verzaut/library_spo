@@ -7,6 +7,11 @@ import styles from './Navigation.module.css';
 export default function Navigation() {
   const { user, logout } = useAuth();
 
+  // Не показываем навигацию для библиотекаря
+  if (user?.role === 'librarian') {
+    return null;
+  }
+
   return (
     <nav className={styles.navigation}>
       <Link href="/libraries" className={styles.logo}>

@@ -1,13 +1,15 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import AddBookForm from '../../components/AddBookForm';
 import { useAuth } from '../../context/AuthContext';
 import styles from './page.module.css';
 
 export default function LibrarianDashboard() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const [showAddBookForm, setShowAddBookForm] = useState(false);
 
   useEffect(() => {
     // Проверяем, авторизован ли пользователь и является ли он библиотекарем
@@ -21,12 +23,32 @@ export default function LibrarianDashboard() {
     return null;
   }
 
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
+
+  const handleAddBook = (bookData: {
+    title: string;
+    author: string;
+    year: number;
+    genre: string;
+    description: string;
+  }) => {
+    // Здесь будет логика добавления книги в базу данных
+    console.log('Новая книга:', bookData);
+    alert('Книга успешно добавлена!');
+  };
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
         <h1>Панель управления библиотекаря</h1>
         <div className={styles.userInfo}>
           <span>{user.firstName}</span>
+          <button onClick={handleLogout} className={styles.logoutButton}>
+            Выйти
+          </button>
         </div>
       </header>
 
@@ -71,7 +93,10 @@ export default function LibrarianDashboard() {
         <section className={styles.section}>
           <h2>Управление каталогом</h2>
           <div className={styles.actionButtons}>
-            <button className={styles.actionButton}>
+            <button 
+              className={styles.actionButton}
+              onClick={() => setShowAddBookForm(true)}
+            >
               Добавить книгу
             </button>
             <button className={styles.actionButton}>
@@ -83,6 +108,13 @@ export default function LibrarianDashboard() {
           </div>
         </section>
       </main>
+
+      {showAddBookForm && (
+        <AddBookForm
+          onClose={() => setShowAddBookForm(false)}
+          onSubmit={handleAddBook}
+        />
+      )}
     </div>
   );
 } 
