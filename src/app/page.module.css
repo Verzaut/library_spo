@@ -11,62 +11,60 @@
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 2.5rem;
   color: #333;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   text-align: center;
 }
 
-.librariesGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+.roleSelection {
+  display: flex;
   gap: 2rem;
-  padding: 1rem;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.libraryCard {
+.roleCard {
+  flex: 1;
   background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
   text-decoration: none;
-  color: inherit;
-}
-
-.libraryCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.libraryName {
-  font-size: 1.25rem;
-  font-weight: 600;
   color: #333;
-  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  max-width: 300px;
 }
 
-.libraryInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  font-size: 0.9rem;
+.roleCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.roleIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.roleCard h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #2563eb;
+}
+
+.roleCard p {
   color: #666;
-}
-
-.libraryDetail {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.icon {
-  width: 20px;
-  color: #0070f3;
+  line-height: 1.5;
 }
 
 .footer {
@@ -80,12 +78,18 @@
     padding: 1rem;
   }
 
-  .librariesGrid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+  .title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
   }
 
-  .title {
-    font-size: 1.5rem;
+  .roleSelection {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .roleCard {
+    width: 100%;
   }
 }

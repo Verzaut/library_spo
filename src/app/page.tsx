@@ -1,43 +1,26 @@
 'use client'; // Важно для использования хуков
 
 import Link from 'next/link';
-import { libraries } from './data/libraries';
 import styles from './page.module.css';
 
 export default function Home() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-        <h1 className={styles.title}>Выберите библиотеку</h1>
+        <h1 className={styles.title}>Добро пожаловать в библиотечную систему</h1>
         
-        <div className={styles.librariesGrid}>
-          {libraries.map(library => (
-            <Link 
-              key={library.id}
-              href={`/register?library=${library.id}`}
-              className={styles.libraryCard}
-            >
-              <h2 className={styles.libraryName}>{library.name}</h2>
-              <div className={styles.libraryInfo}>
-                <div className={styles.libraryDetail}>
-                  <span className={styles.icon}>📍</span>
-                  <span>{library.address}</span>
-                </div>
-                <div className={styles.libraryDetail}>
-                  <span className={styles.icon}>🏢</span>
-                  <span>{library.district}</span>
-                </div>
-                <div className={styles.libraryDetail}>
-                  <span className={styles.icon}>🕒</span>
-                  <span>{library.workingHours}</span>
-                </div>
-                <div className={styles.libraryDetail}>
-                  <span className={styles.icon}>📞</span>
-                  <span>{library.phone}</span>
-                </div>
-              </div>
-            </Link>
-          ))}
+        <div className={styles.roleSelection}>
+          <Link href="/libraries?role=reader" className={styles.roleCard}>
+            <div className={styles.roleIcon}>👤</div>
+            <h2>Читатель</h2>
+            <p>Поиск и бронирование книг, управление заказами</p>
+          </Link>
+          
+          <Link href="/libraries?role=librarian" className={styles.roleCard}>
+            <div className={styles.roleIcon}>👨‍💼</div>
+            <h2>Библиотекарь</h2>
+            <p>Управление библиотекой, каталогом и читателями</p>
+          </Link>
         </div>
       </main>
 
