@@ -4,107 +4,110 @@
   padding: 2rem;
 }
 
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  font-size: 1.2rem;
+  color: #666;
+}
+
 .header {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eaeaea;
 }
 
 .header h1 {
-  font-size: 2.5rem;
+  margin: 0;
   color: #333;
-  margin: 0 0 1rem 0;
+  font-size: 2rem;
 }
 
 .userInfo {
-  color: #666;
+  margin-top: 1rem;
 }
 
 .userName {
   font-size: 1.2rem;
   font-weight: 500;
+  color: #333;
   margin: 0;
 }
 
 .userEmail {
-  font-size: 1rem;
-  margin: 0.5rem 0 0 0;
+  color: #666;
+  margin: 0.5rem 0 0;
 }
 
 .statsSection {
   margin-bottom: 3rem;
 }
 
-.statsSection h2 {
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 1.5rem;
-}
-
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 .statCard {
   background: white;
-  border-radius: 12px;
   padding: 1.5rem;
+  border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-}
-
-.statCard:hover {
-  transform: translateY(-4px);
 }
 
 .statCard h3 {
+  margin: 0;
   font-size: 1rem;
   color: #666;
-  margin: 0 0 0.5rem 0;
 }
 
 .statCard p {
-  font-size: 2rem;
+  margin: 0.5rem 0 0;
+  font-size: 1.5rem;
   font-weight: 600;
   color: #333;
-  margin: 0;
 }
 
 .booksSection {
-  margin-bottom: 3rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .booksSection h2 {
-  font-size: 1.5rem;
+  margin: 0 0 1.5rem;
   color: #333;
-  margin-bottom: 1.5rem;
 }
 
 .booksList {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
 }
 
 .bookCard {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #eaeaea;
 }
 
 .bookInfo h3 {
+  margin: 0;
   font-size: 1.2rem;
   color: #333;
-  margin: 0 0 0.5rem 0;
 }
 
 .author {
+  margin: 0.5rem 0;
   color: #666;
-  margin: 0;
-  font-style: italic;
 }
 
 .bookingInfo {
@@ -112,42 +115,8 @@
 }
 
 .bookingInfo p {
-  margin: 0 0 0.5rem 0;
+  margin: 0.25rem 0;
   color: #666;
-  font-size: 0.9rem;
-}
-
-.status {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.statusActive {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
-
-.statusReturned {
-  background-color: #e3f2fd;
-  color: #1976d2;
-}
-
-.statusOverdue {
-  background-color: #ffebee;
-  color: #c62828;
-}
-
-.noBooks {
-  text-align: center;
-  color: #666;
-  font-size: 1.1rem;
-  padding: 3rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .bookActions {
@@ -157,23 +126,51 @@
   margin-top: 1rem;
 }
 
-.returnButton {
-  background: #ffebee;
+.status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.statusActive {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.statusReturned {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.statusOverdue {
+  background-color: #ffebee;
   color: #c62828;
-  border: none;
+}
+
+.returnButton {
   padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  background-color: #f44336;
+  color: white;
   cursor: pointer;
+  font-size: 0.875rem;
   transition: background-color 0.2s;
 }
 
 .returnButton:hover {
-  background: #ffcdd2;
+  background-color: #d32f2f;
 }
 
-/* Responsive styles */
+.noBooks {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 0;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -188,6 +185,12 @@
     margin-top: 1rem;
   }
 
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
   .statsGrid {
     grid-template-columns: 1fr;
   }

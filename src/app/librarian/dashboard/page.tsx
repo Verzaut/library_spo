@@ -1,22 +1,68 @@
 'use client';
 
+import AddBookForm from '@/app/components/AddBookForm';
+import { useAuth } from '@/app/context/AuthContext';
+import { bookService } from '@/app/services/bookService';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import AddBookForm from '../../components/AddBookForm';
-import { useAuth } from '../../context/AuthContext';
 import styles from './page.module.css';
+
+type BookActivity = {
+  id: string;
+  time: string;
+  bookTitle: string;
+  author: string;
+};
 
 export default function LibrarianDashboard() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [showAddBookForm, setShowAddBookForm] = useState(false);
+  const [totalBooks, setTotalBooks] = useState(0);
+  const [recentActivities, setRecentActivities] = useState<BookActivity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Проверяем, авторизован ли пользователь и является ли он библиотекарем
-    if (!user || user.role !== 'librarian') {
-      router.push('/librarian/login');
-    }
+    let mounted = true;
+
+    const initializeDashboard = async () => {
+      try {
+        // Проверяем, авторизован ли пользователь и является ли он библиотекарем
+        if (!user || user.role !== 'librarian') {
+          router.push('/librarian/login');
+          return;
+        }
+
+        // Загружаем общее количество книг
+        const books = bookService.getAllBooks();
+        if (mounted) {
+          setTotalBooks(books.length);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Error initializing dashboard:', error);
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    initializeDashboard();
+
+    // Cleanup function
+    return () => {
+      mounted = false;
+    };
   }, [user, router]);
+
+  // Если идет загрузка, показываем индикатор загрузки
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>Загрузка...</div>
+      </div>
+    );
+  }
 
   // Если пользователь не авторизован или не является библиотекарем, не показываем содержимое
   if (!user || user.role !== 'librarian') {
@@ -35,9 +81,32 @@ export default function LibrarianDashboard() {
     genre: string;
     description: string;
   }) => {
-    // Здесь будет логика добавления книги в базу данных
-    console.log('Новая книга:', bookData);
-    alert('Книга успешно добавлена!');
+    try {
+      const newBook = bookService.addBook(bookData);
+      if (newBook) {
+        setTotalBooks(prev => prev + 1);
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('ru-RU', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        
+        const newActivity: BookActivity = {
+          id: newBook.id,
+          time: timeString,
+          bookTitle: bookData.title,
+          author: bookData.author
+        };
+
+        setRecentActivities(prev => [newActivity, ...prev].slice(0, 5));
+        setShowAddBookForm(false);
+        alert('Книга успешно добавлена!');
+      }
+    } catch (error) {
+      console.error('Error adding book:', error);
+      alert('Произошла ошибка при добавлении книги');
+    }
   };
 
   return (
@@ -56,37 +125,31 @@ export default function LibrarianDashboard() {
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
             <h3>Всего книг</h3>
-            <p>150</p>
+            <p>{totalBooks}</p>
           </div>
           <div className={styles.statCard}>
-            <h3>Активные брони</h3>
-            <p>25</p>
-          </div>
-          <div className={styles.statCard}>
-            <h3>Просроченные</h3>
-            <p>3</p>
-          </div>
-          <div className={styles.statCard}>
-            <h3>Читателей</h3>
-            <p>45</p>
+            <h3>Добавлено сегодня</h3>
+            <p>{recentActivities.length}</p>
           </div>
         </div>
 
         <section className={styles.section}>
-          <h2>Последние действия</h2>
+          <h2>Последние добавленные книги</h2>
           <div className={styles.activityList}>
-            <div className={styles.activityItem}>
-              <span className={styles.activityTime}>14:30</span>
-              <span className={styles.activityText}>Иван Петров забронировал "Война и мир"</span>
-            </div>
-            <div className={styles.activityItem}>
-              <span className={styles.activityTime}>13:15</span>
-              <span className={styles.activityText}>Анна Сидорова отменила бронь "Мастер и Маргарита"</span>
-            </div>
-            <div className={styles.activityItem}>
-              <span className={styles.activityTime}>12:45</span>
-              <span className={styles.activityText}>Новая регистрация: Петр Иванов</span>
-            </div>
+            {recentActivities.length > 0 ? (
+              recentActivities.map(activity => (
+                <div key={activity.id} className={styles.activityItem}>
+                  <span className={styles.activityTime}>{activity.time}</span>
+                  <span className={styles.activityText}>
+                    Добавлена книга: "{activity.bookTitle}" ({activity.author})
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className={styles.noActivities}>
+                Сегодня книги ещё не добавлялись
+              </div>
+            )}
           </div>
         </section>
 
@@ -98,12 +161,6 @@ export default function LibrarianDashboard() {
               onClick={() => setShowAddBookForm(true)}
             >
               Добавить книгу
-            </button>
-            <button className={styles.actionButton}>
-              Управление читателями
-            </button>
-            <button className={styles.actionButton}>
-              Отчеты
             </button>
           </div>
         </section>

@@ -1,14 +1,22 @@
 'use client';
 
+import ProtectedRoute from '@/app/components/ProtectedRoute';
+import { useAuth } from '@/app/context/AuthContext';
+import { bookingService } from '@/app/services/bookingService';
 import { useEffect, useState } from 'react';
-import ProtectedRoute from '../components/ProtectedRoute';
-import { useAuth } from '../context/AuthContext';
-import { BookedBook, bookingService } from '../services/bookingService';
 import styles from './profile.module.css';
 
 export default function Profile() {
   const { user } = useAuth();
-  const [bookedBooks, setBookedBooks] = useState<BookedBook[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [bookedBooks, setBookedBooks] = useState<Array<{
+    id: string;
+    title: string;
+    author: string;
+    bookingDate: Date;
+    returnDate: Date;
+    status: string;
+  }>>([]);
   const [stats, setStats] = useState({
     totalBooked: 0,
     currentlyBooked: 0,
@@ -17,34 +25,34 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    if (!user?.id) return;
+    const loadUserData = async () => {
+      try {
+        if (user?.id) {
+          // Обновляем статусы книг
+          bookingService.updateBookStatuses();
+          // Загружаем книги пользователя
+          const books = bookingService.getUserBooks(user.id);
+          setBookedBooks(books.map(book => ({
+            ...book,
+            bookingDate: new Date(book.bookingDate),
+            returnDate: new Date(book.returnDate)
+          })));
 
-    // Обновляем статусы книг (проверяем просроченные)
-    bookingService.updateBookStatuses();
+          // Загружаем статистику
+          const userStats = bookingService.getUserStats(user.id);
+          setStats(userStats);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // Загружаем книги пользователя
-    const userBooks = bookingService.getUserBooks(user.id);
-    setBookedBooks(userBooks);
-
-    // Загружаем статистику
-    const userStats = bookingService.getUserStats(user.id);
-    setStats(userStats);
+    loadUserData();
   }, [user?.id]);
 
-  // Обработчик возврата книги
-  const handleReturnBook = (bookId: string) => {
-    if (!user?.id) return;
-
-    if (bookingService.returnBook(user.id, bookId)) {
-      // Обновляем данные после возврата
-      const userBooks = bookingService.getUserBooks(user.id);
-      setBookedBooks(userBooks);
-      const userStats = bookingService.getUserStats(user.id);
-      setStats(userStats);
-    }
-  };
-
-  const getStatusText = (status: BookedBook['status']) => {
+  const getStatusText = (status: string) => {
     switch (status) {
       case 'active':
         return 'Активно';
@@ -53,11 +61,11 @@ export default function Profile() {
       case 'overdue':
         return 'Просрочено';
       default:
-        return '';
+        return status;
     }
   };
 
-  const getStatusClass = (status: BookedBook['status']) => {
+  const getStatusClass = (status: string) => {
     switch (status) {
       case 'active':
         return styles.statusActive;
@@ -71,6 +79,9 @@ export default function Profile() {
   };
 
   const formatDate = (date: Date) => {
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+      return 'Дата не указана';
+    }
     return date.toLocaleDateString('ru-RU', {
       year: 'numeric',
       month: 'long',
@@ -78,14 +89,46 @@ export default function Profile() {
     });
   };
 
+  const handleCancelBooking = (bookId: string) => {
+    if (!user?.id) return;
+
+    try {
+      bookingService.returnBook(user.id, bookId);
+      setBookedBooks(prevBooks => 
+        prevBooks.map(book => 
+          book.id === bookId 
+            ? { ...book, status: 'returned' }
+            : book
+        )
+      );
+      // Обновляем статистику после отмены бронирования
+      const userStats = bookingService.getUserStats(user.id);
+      setStats(userStats);
+    } catch (error) {
+      console.error('Error canceling booking:', error);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>Загрузка...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <ProtectedRoute>
       <div className={styles.container}>
         <header className={styles.header}>
           <h1>Профиль</h1>
           <div className={styles.userInfo}>
-            <p className={styles.userName}>{user?.firstName} {user?.lastName}</p>
-            <p className={styles.userEmail}>{user?.email}</p>
+            <p className={styles.userName}>{user.firstName} {user.lastName}</p>
+            <p className={styles.userEmail}>{user.email}</p>
           </div>
         </header>
 
@@ -116,7 +159,7 @@ export default function Profile() {
           {bookedBooks.length > 0 ? (
             <div className={styles.booksList}>
               {bookedBooks.map(book => (
-                <div key={book.id} className={styles.bookCard}>
+                <div key={`${book.id}-${book.bookingDate.getTime()}`} className={styles.bookCard}>
                   <div className={styles.bookInfo}>
                     <h3>{book.title}</h3>
                     <p className={styles.author}>{book.author}</p>
@@ -130,7 +173,7 @@ export default function Profile() {
                       </span>
                       {book.status === 'active' && (
                         <button
-                          onClick={() => handleReturnBook(book.id)}
+                          onClick={() => handleCancelBooking(book.id)}
                           className={styles.returnButton}
                         >
                           Отменить бронь

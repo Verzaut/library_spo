@@ -1,9 +1,10 @@
 'use client';
 
+import ProtectedRoute from '@/app/components/ProtectedRoute';
+import { useAuth } from '@/app/context/AuthContext';
+import { bookingService } from '@/app/services/bookingService';
+import { Book, bookService } from '@/app/services/bookService';
 import { useEffect, useState } from 'react';
-import ProtectedRoute from '../components/ProtectedRoute';
-import { useAuth } from '../context/AuthContext';
-import { bookingService } from '../services/bookingService';
 import styles from './catalog.module.css';
 
 // Типы данных
@@ -13,21 +14,6 @@ type Review = {
   userName: string;
   text: string;
   date: Date;
-};
-
-type Book = {
-  id: string;
-  title: string;
-  author: string;
-  year: number;
-  genre: string;
-  available: boolean;
-  coverUrl: string;
-  description: string;
-  rating: number | null;
-  totalRatings: number;
-  averageRating: number;
-  reviews: Review[];
 };
 
 // Временные данные для демонстрации
@@ -211,61 +197,35 @@ const mockBooks: Book[] = [
 ];
 
 // Компонент для отображения отзывов
-const ReviewSection = ({ book, onAddReview }: { book: Book; onAddReview: (text: string) => void }) => {
-  const [reviewText, setReviewText] = useState('');
+const ReviewSection = ({ book, onAddReview }: { book: Book, onAddReview: (text: string) => void }) => {
   const [showForm, setShowForm] = useState(false);
-  const [wordCount, setWordCount] = useState(0);
-
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const text = e.target.value;
-    if (text === '') {
-      setReviewText('');
-      setWordCount(0);
-      return;
-    }
-    
-    const words = text.trim().split(/\s+/);
-    if (words.length <= 100) {
-      setReviewText(text);
-      setWordCount(words.length);
-    }
-  };
+  const [reviewText, setReviewText] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (reviewText.trim() && wordCount <= 100) {
-      onAddReview(reviewText);
-      setReviewText('');
-      setShowForm(false);
-      setWordCount(0);
-    }
-  };
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('ru-RU', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    onAddReview(reviewText);
+    setReviewText('');
+    setShowForm(false);
   };
 
   return (
     <div className={styles.reviewSection}>
-      <h4>Отзывы</h4>
-      {book.reviews.map(review => (
+      <h4>Отзывы ({book.reviews.length})</h4>
+      {book.reviews.map((review: Review) => (
         <div key={review.id} className={styles.review}>
           <div className={styles.reviewHeader}>
             <span className={styles.reviewAuthor}>{review.userName}</span>
-            <span className={styles.reviewDate}>{formatDate(review.date)}</span>
+            <span className={styles.reviewDate}>
+              {review.date.toLocaleDateString()}
+            </span>
           </div>
           <p className={styles.reviewText}>{review.text}</p>
         </div>
       ))}
-      
       {!showForm ? (
         <button
-          className={styles.addReviewButton}
           onClick={() => setShowForm(true)}
+          className={styles.addReviewButton}
         >
           Написать отзыв
         </button>
@@ -273,30 +233,15 @@ const ReviewSection = ({ book, onAddReview }: { book: Book; onAddReview: (text: 
         <form onSubmit={handleSubmit} className={styles.reviewForm}>
           <textarea
             value={reviewText}
-            onChange={handleTextChange}
-            placeholder="Напишите ваш отзыв (не более 100 слов)"
-            className={styles.reviewTextarea}
+            onChange={(e) => setReviewText(e.target.value)}
+            placeholder="Напишите ваш отзыв..."
+            required
           />
-          <div className={styles.reviewFormFooter}>
-            <span className={styles.wordCount}>
-              {wordCount}/100 слов
-            </span>
-            <div className={styles.reviewFormButtons}>
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className={styles.cancelButton}
-              >
-                Отмена
-              </button>
-              <button
-                type="submit"
-                disabled={!reviewText.trim() || wordCount > 100}
-                className={styles.submitButton}
-              >
-                Отправить
-              </button>
-            </div>
+          <div className={styles.reviewFormButtons}>
+            <button type="button" onClick={() => setShowForm(false)}>
+              Отмена
+            </button>
+            <button type="submit">Отправить</button>
           </div>
         </form>
       )}
@@ -306,12 +251,16 @@ const ReviewSection = ({ book, onAddReview }: { book: Book; onAddReview: (text: 
 
 export default function Catalog() {
   const { user } = useAuth();
-  const [books, setBooks] = useState<Book[]>(mockBooks);
+  const [books, setBooks] = useState<Book[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [userBookings, setUserBookings] = useState(0);
 
   useEffect(() => {
+    // Загружаем книги при монтировании компонента
+    const loadedBooks = bookService.getAllBooks();
+    setBooks(loadedBooks);
+
     if (!user?.id) return;
 
     // Обновляем статусы книг
@@ -356,45 +305,43 @@ export default function Catalog() {
 
   // Обработчик оценки книги
   const handleRating = (bookId: string, rating: number) => {
-    setBooks(books.map(book => {
-      if (book.id === bookId) {
-        const newTotalRatings = book.rating === null ? book.totalRatings + 1 : book.totalRatings;
-        const oldRatingSum = book.averageRating * book.totalRatings;
-        const newRatingSum = book.rating === null 
-          ? oldRatingSum + rating
-          : oldRatingSum - book.rating + rating;
-        
-        return {
-          ...book,
-          rating: rating,
-          totalRatings: newTotalRatings,
-          averageRating: Number((newRatingSum / newTotalRatings).toFixed(1))
-        };
-      }
-      return book;
-    }));
-    // Здесь будет логика отправки оценки на сервер
+    const updatedBook = bookService.updateBook(bookId, {
+      rating,
+      totalRatings: books.find(b => b.id === bookId)?.totalRatings as number + 1,
+      averageRating: rating // В реальном приложении здесь будет расчет среднего рейтинга
+    });
+
+    if (updatedBook) {
+      setBooks(books.map(book => 
+        book.id === bookId ? updatedBook : book
+      ));
+    }
   };
 
   // Обработчик добавления отзыва
   const handleAddReview = (bookId: string, text: string) => {
-    setBooks(books.map(book => {
-      if (book.id === bookId) {
-        const newReview: Review = {
-          id: Date.now().toString(),
-          userId: user?.id || 'unknown',
-          userName: `${user?.firstName} ${user?.lastName}`,
-          text,
-          date: new Date()
-        };
-        return {
-          ...book,
-          reviews: [...book.reviews, newReview]
-        };
-      }
-      return book;
-    }));
-    // Здесь будет логика отправки отзыва на сервер
+    if (!user) return;
+
+    const book = books.find(b => b.id === bookId);
+    if (!book) return;
+
+    const newReview: Review = {
+      id: Date.now().toString(),
+      userId: user.id,
+      userName: `${user.firstName} ${user.lastName}`,
+      text,
+      date: new Date()
+    };
+
+    const updatedBook = bookService.updateBook(bookId, {
+      reviews: [...book.reviews, newReview]
+    });
+
+    if (updatedBook) {
+      setBooks(books.map(b => 
+        b.id === bookId ? updatedBook : b
+      ));
+    }
   };
 
   // Компонент для отображения звёздочек рейтинга
