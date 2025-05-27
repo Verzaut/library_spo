@@ -1,142 +1,150 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
+import { BookedBook, bookingService } from '../services/bookingService';
 import styles from './profile.module.css';
-
-type BookHistory = {
-  id: string;
-  title: string;
-  author: string;
-  dateBooked: Date;
-  dateReturned: Date | null;
-  status: 'reading' | 'returned';
-  rating: number | null;
-};
-
-// Временные данные для демонстрации
-const mockHistory: BookHistory[] = [
-  {
-    id: '1',
-    title: 'Война и мир',
-    author: 'Лев Толстой',
-    dateBooked: new Date('2024-02-01'),
-    dateReturned: new Date('2024-03-01'),
-    status: 'returned',
-    rating: 9
-  },
-  {
-    id: '2',
-    title: 'Преступление и наказание',
-    author: 'Фёдор Достоевский',
-    dateBooked: new Date('2024-03-05'),
-    dateReturned: null,
-    status: 'reading',
-    rating: null
-  }
-];
 
 export default function Profile() {
   const { user } = useAuth();
-  const [bookHistory] = useState<BookHistory[]>(mockHistory);
+  const [bookedBooks, setBookedBooks] = useState<BookedBook[]>([]);
+  const [stats, setStats] = useState({
+    totalBooked: 0,
+    currentlyBooked: 0,
+    returned: 0,
+    overdue: 0,
+  });
 
-  // Статистика
-  const totalBooks = bookHistory.length;
-  const currentlyReading = bookHistory.filter(book => book.status === 'reading').length;
-  const booksReturned = bookHistory.filter(book => book.status === 'returned').length;
-  const averageRating = bookHistory
-    .filter(book => book.rating !== null)
-    .reduce((acc, book) => acc + (book.rating || 0), 0) / 
-    bookHistory.filter(book => book.rating !== null).length;
+  useEffect(() => {
+    if (!user?.id) return;
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('ru-RU', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    // Обновляем статусы книг (проверяем просроченные)
+    bookingService.updateBookStatuses();
+
+    // Загружаем книги пользователя
+    const userBooks = bookingService.getUserBooks(user.id);
+    setBookedBooks(userBooks);
+
+    // Загружаем статистику
+    const userStats = bookingService.getUserStats(user.id);
+    setStats(userStats);
+  }, [user?.id]);
+
+  // Обработчик возврата книги
+  const handleReturnBook = (bookId: string) => {
+    if (!user?.id) return;
+
+    if (bookingService.returnBook(user.id, bookId)) {
+      // Обновляем данные после возврата
+      const userBooks = bookingService.getUserBooks(user.id);
+      setBookedBooks(userBooks);
+      const userStats = bookingService.getUserStats(user.id);
+      setStats(userStats);
+    }
   };
 
-  // Компонент для отображения рейтинга
-  const RatingStars = ({ rating }: { rating: number | null }) => {
-    if (rating === null) return null;
-    
-    return (
-      <div className={styles.rating}>
-        {[...Array(10)].map((_, index) => (
-          <span
-            key={index}
-            className={`${styles.star} ${index < rating ? styles.active : ''}`}
-          >
-            ★
-          </span>
-        ))}
-      </div>
-    );
+  const getStatusText = (status: BookedBook['status']) => {
+    switch (status) {
+      case 'active':
+        return 'Активно';
+      case 'returned':
+        return 'Возвращено';
+      case 'overdue':
+        return 'Просрочено';
+      default:
+        return '';
+    }
+  };
+
+  const getStatusClass = (status: BookedBook['status']) => {
+    switch (status) {
+      case 'active':
+        return styles.statusActive;
+      case 'returned':
+        return styles.statusReturned;
+      case 'overdue':
+        return styles.statusOverdue;
+      default:
+        return '';
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
   };
 
   return (
     <ProtectedRoute>
       <div className={styles.container}>
         <header className={styles.header}>
-          <h1>Профиль читателя</h1>
+          <h1>Профиль</h1>
+          <div className={styles.userInfo}>
+            <p className={styles.userName}>{user?.firstName} {user?.lastName}</p>
+            <p className={styles.userEmail}>{user?.email}</p>
+          </div>
         </header>
 
-        <main className={styles.main}>
-          <section className={styles.userInfo}>
-            <div className={styles.userAvatar}>👤</div>
-            <div className={styles.userDetails}>
-              <h2>{user?.firstName} {user?.lastName}</h2>
-              <p className={styles.email}>{user?.email}</p>
+        <section className={styles.statsSection}>
+          <h2>Статистика бронирования</h2>
+          <div className={styles.statsGrid}>
+            <div className={styles.statCard}>
+              <h3>Всего забронировано</h3>
+              <p>{stats.totalBooked}</p>
             </div>
-          </section>
+            <div className={styles.statCard}>
+              <h3>Текущие бронирования</h3>
+              <p>{stats.currentlyBooked}/5</p>
+            </div>
+            <div className={styles.statCard}>
+              <h3>Возвращено</h3>
+              <p>{stats.returned}</p>
+            </div>
+            <div className={styles.statCard}>
+              <h3>Просрочено</h3>
+              <p>{stats.overdue}</p>
+            </div>
+          </div>
+        </section>
 
-          <section className={styles.statistics}>
-            <div className={styles.statCard}>
-              <h3>Всего книг</h3>
-              <p className={styles.statNumber}>{totalBooks}</p>
-            </div>
-            <div className={styles.statCard}>
-              <h3>Читаю сейчас</h3>
-              <p className={styles.statNumber}>{currentlyReading}</p>
-            </div>
-            <div className={styles.statCard}>
-              <h3>Прочитано</h3>
-              <p className={styles.statNumber}>{booksReturned}</p>
-            </div>
-            <div className={styles.statCard}>
-              <h3>Средняя оценка</h3>
-              <p className={styles.statNumber}>
-                {averageRating ? averageRating.toFixed(1) : '-'}
-              </p>
-            </div>
-          </section>
-
-          <section className={styles.history}>
-            <h2>История книг</h2>
-            <div className={styles.bookList}>
-              {bookHistory.map(book => (
-                <div key={book.id} className={styles.bookItem}>
+        <section className={styles.booksSection}>
+          <h2>Забронированные книги</h2>
+          {bookedBooks.length > 0 ? (
+            <div className={styles.booksList}>
+              {bookedBooks.map(book => (
+                <div key={book.id} className={styles.bookCard}>
                   <div className={styles.bookInfo}>
                     <h3>{book.title}</h3>
-                    <p>{book.author}</p>
-                    {book.rating && <RatingStars rating={book.rating} />}
+                    <p className={styles.author}>{book.author}</p>
                   </div>
-                  <div className={styles.bookDates}>
-                    <p>Взята: {formatDate(book.dateBooked)}</p>
-                    {book.dateReturned && (
-                      <p>Возвращена: {formatDate(book.dateReturned)}</p>
-                    )}
-                  </div>
-                  <div className={`${styles.status} ${styles[book.status]}`}>
-                    {book.status === 'reading' ? 'Читается' : 'Возвращена'}
+                  <div className={styles.bookingInfo}>
+                    <p>Забронировано: {formatDate(book.bookingDate)}</p>
+                    <p>Дата возврата: {formatDate(book.returnDate)}</p>
+                    <div className={styles.bookActions}>
+                      <span className={`${styles.status} ${getStatusClass(book.status)}`}>
+                        {getStatusText(book.status)}
+                      </span>
+                      {book.status === 'active' && (
+                        <button
+                          onClick={() => handleReturnBook(book.id)}
+                          className={styles.returnButton}
+                        >
+                          Отменить бронь
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-          </section>
-        </main>
+          ) : (
+            <p className={styles.noBooks}>У вас пока нет забронированных книг</p>
+          )}
+        </section>
       </div>
     </ProtectedRoute>
   );

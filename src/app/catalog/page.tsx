@@ -1,9 +1,9 @@
 'use client';
 
-import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
+import { bookingService } from '../services/bookingService';
 import styles from './catalog.module.css';
 
 // Типы данных
@@ -218,12 +218,16 @@ const ReviewSection = ({ book, onAddReview }: { book: Book; onAddReview: (text: 
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
-    const words = text.trim().split(/\s+/).length;
     if (text === '') {
+      setReviewText('');
       setWordCount(0);
-    } else if (words <= 100) {
+      return;
+    }
+    
+    const words = text.trim().split(/\s+/);
+    if (words.length <= 100) {
       setReviewText(text);
-      setWordCount(words);
+      setWordCount(words.length);
     }
   };
 
@@ -301,10 +305,22 @@ const ReviewSection = ({ book, onAddReview }: { book: Book; onAddReview: (text: 
 };
 
 export default function Catalog() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [books, setBooks] = useState<Book[]>(mockBooks);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('all');
+  const [userBookings, setUserBookings] = useState(0);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    // Обновляем статусы книг
+    bookingService.updateBookStatuses();
+
+    // Получаем количество активных бронирований пользователя
+    const activeBookings = bookingService.getUserActiveBookingsCount(user.id);
+    setUserBookings(activeBookings);
+  }, [user?.id]);
 
   // Получаем уникальные жанры из списка книг
   const genres = ['all', ...new Set(books.map(book => book.genre))];
@@ -318,12 +334,24 @@ export default function Catalog() {
   });
 
   // Обработчик бронирования
-  const handleBooking = (bookId: string) => {
-    setBooks(books.map(book => 
-      book.id === bookId ? { ...book, available: false } : book
-    ));
-    // Здесь будет логика отправки запроса на сервер
-    alert('Книга забронирована!');
+  const handleBooking = (book: Book) => {
+    if (!user?.id) return;
+
+    const booking = bookingService.bookBook(user.id, {
+      id: book.id,
+      title: book.title,
+      author: book.author,
+    });
+
+    if (booking) {
+      setBooks(books.map(b => 
+        b.id === book.id ? { ...b, available: false } : b
+      ));
+      setUserBookings(prev => prev + 1);
+      alert('Книга успешно забронирована!');
+    } else {
+      alert('Вы не можете забронировать больше 5 книг одновременно');
+    }
   };
 
   // Обработчик оценки книги
@@ -398,16 +426,11 @@ export default function Catalog() {
         <header className={styles.header}>
           <div className={styles.headerContent}>
             <h1>Каталог книг</h1>
-            <div className={styles.userInfo}>
-              <Link href="/profile" className={styles.profileLink}>
-                <span className={styles.userName}>
-                  {user?.firstName} {user?.lastName}
-                </span>
-                <span className={styles.profileIcon}>👤</span>
-              </Link>
-              <button onClick={logout} className={styles.logoutButton}>
-                Выйти
-              </button>
+            <div className={`${styles.bookingLimit} ${
+              userBookings >= 5 ? styles.full :
+              userBookings >= 4 ? styles.warning : ''
+            }`}>
+              Забронировано книг: {userBookings}/5
             </div>
           </div>
           <div className={styles.filters}>
@@ -457,10 +480,10 @@ export default function Catalog() {
                   />
                   <button
                     className={`${styles.bookingButton} ${!book.available ? styles.booked : ''}`}
-                    onClick={() => handleBooking(book.id)}
-                    disabled={!book.available}
+                    onClick={() => book.available && handleBooking(book)}
+                    disabled={!book.available || userBookings >= 5}
                   >
-                    {book.available ? 'Забронировать' : 'Забронировано'}
+                    {!book.available ? 'Забронировано' : 'Забронировать'}
                   </button>
                 </div>
               </div>

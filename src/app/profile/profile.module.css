@@ -1,57 +1,45 @@
 .container {
-  padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 2rem;
 }
 
 .header {
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
 }
 
 .header h1 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   color: #333;
-}
-
-.main {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  margin: 0 0 1rem 0;
 }
 
 .userInfo {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  padding: 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.userAvatar {
-  width: 100px;
-  height: 100px;
-  background: #f0f0f0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-}
-
-.userDetails h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  color: #333;
-}
-
-.email {
-  margin: 0.5rem 0 0;
   color: #666;
 }
 
-.statistics {
+.userName {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.userEmail {
+  font-size: 1rem;
+  margin: 0.5rem 0 0 0;
+}
+
+.statsSection {
+  margin-bottom: 3rem;
+}
+
+.statsSection h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.statsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
@@ -59,122 +47,148 @@
 
 .statCard {
   background: white;
-  padding: 1.5rem;
   border-radius: 12px;
+  padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  transition: transform 0.2s;
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
 }
 
 .statCard h3 {
-  margin: 0;
-  color: #666;
   font-size: 1rem;
+  color: #666;
+  margin: 0 0 0.5rem 0;
 }
 
-.statNumber {
-  margin: 0.5rem 0 0;
+.statCard p {
   font-size: 2rem;
-  font-weight: bold;
-  color: #0070f3;
-}
-
-.history {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.history h2 {
-  margin: 0 0 1.5rem;
+  font-weight: 600;
   color: #333;
+  margin: 0;
 }
 
-.bookList {
-  display: flex;
-  flex-direction: column;
+.booksSection {
+  margin-bottom: 3rem;
+}
+
+.booksSection h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.booksList {
+  display: grid;
   gap: 1rem;
 }
 
-.bookItem {
+.bookCard {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  gap: 1rem;
+  align-items: flex-start;
 }
 
 .bookInfo h3 {
-  margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: #333;
+  margin: 0 0 0.5rem 0;
 }
 
-.bookInfo p {
-  margin: 0.25rem 0 0;
+.author {
   color: #666;
+  margin: 0;
+  font-style: italic;
 }
 
-.bookDates {
+.bookingInfo {
+  text-align: right;
+}
+
+.bookingInfo p {
+  margin: 0 0 0.5rem 0;
   color: #666;
   font-size: 0.9rem;
 }
 
-.bookDates p {
-  margin: 0;
-}
-
 .status {
+  display: inline-block;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 500;
 }
 
-.reading {
-  background: #e3f2fd;
-  color: #0070f3;
-}
-
-.returned {
-  background: #e8f5e9;
+.statusActive {
+  background-color: #e8f5e9;
   color: #2e7d32;
 }
 
-.rating {
+.statusReturned {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.statusOverdue {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.noBooks {
+  text-align: center;
+  color: #666;
+  font-size: 1.1rem;
+  padding: 3rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bookActions {
   display: flex;
-  gap: 2px;
-  margin-top: 0.5rem;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
-.star {
-  font-size: 1rem;
-  color: #ddd;
+.returnButton {
+  background: #ffebee;
+  color: #c62828;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.star.active {
-  color: #ffd700;
+.returnButton:hover {
+  background: #ffcdd2;
 }
 
+/* Responsive styles */
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
   }
 
-  .userInfo {
+  .bookCard {
     flex-direction: column;
-    text-align: center;
-    padding: 1.5rem;
   }
 
-  .bookItem {
-    flex-direction: column;
-    text-align: center;
+  .bookingInfo {
+    text-align: left;
+    margin-top: 1rem;
   }
 
-  .statistics {
+  .statsGrid {
     grid-template-columns: 1fr;
   }
 } 
