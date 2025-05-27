@@ -23,8 +23,22 @@ class BookingService {
     return userBooks.filter(book => book.status === 'active').length;
   }
 
+  // Проверить, забронирована ли уже книга пользователем
+  isBookAlreadyBooked(userId: string, bookId: string): boolean {
+    const userBooks = this.getUserBooks(userId);
+    return userBooks.some(book => 
+      book.id === bookId && 
+      (book.status === 'active' || book.status === 'overdue')
+    );
+  }
+
   // Забронировать книгу
   bookBook(userId: string, bookData: { id: string; title: string; author: string; }): BookedBook | null {
+    // Проверяем, не забронирована ли уже эта книга пользователем
+    if (this.isBookAlreadyBooked(userId, bookData.id)) {
+      return null;
+    }
+
     const userActiveBookings = this.getUserActiveBookingsCount(userId);
     
     if (userActiveBookings >= 5) {

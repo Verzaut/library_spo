@@ -286,6 +286,12 @@ export default function Catalog() {
   const handleBooking = (book: Book) => {
     if (!user?.id) return;
 
+    // Проверяем, не забронирована ли уже книга этим пользователем
+    if (bookingService.isBookAlreadyBooked(user.id, book.id)) {
+      alert('Вы уже забронировали эту книгу');
+      return;
+    }
+
     const booking = bookingService.bookBook(user.id, {
       id: book.id,
       title: book.title,
