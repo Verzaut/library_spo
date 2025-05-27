@@ -12,6 +12,7 @@ type BookActivity = {
   time: string;
   bookTitle: string;
   author: string;
+  type?: string;
 };
 
 export default function LibrarianDashboard() {
@@ -21,22 +22,22 @@ export default function LibrarianDashboard() {
   const [totalBooks, setTotalBooks] = useState(0);
   const [recentActivities, setRecentActivities] = useState<BookActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [books, setBooks] = useState<Array<{ id: string; title: string; author: string }>>([]);
 
   useEffect(() => {
     let mounted = true;
 
     const initializeDashboard = async () => {
       try {
-        // Проверяем, авторизован ли пользователь и является ли он библиотекарем
         if (!user || user.role !== 'librarian') {
           router.push('/librarian/login');
           return;
         }
 
-        // Загружаем общее количество книг
-        const books = bookService.getAllBooks();
+        const allBooks = bookService.getAllBooks();
         if (mounted) {
-          setTotalBooks(books.length);
+          setBooks(allBooks);
+          setTotalBooks(allBooks.length);
           setIsLoading(false);
         }
       } catch (error) {
@@ -49,7 +50,6 @@ export default function LibrarianDashboard() {
 
     initializeDashboard();
 
-    // Cleanup function
     return () => {
       mounted = false;
     };
@@ -109,6 +109,40 @@ export default function LibrarianDashboard() {
     }
   };
 
+  const handleDeleteBook = (bookId: string) => {
+    try {
+      const success = bookService.deleteBook(bookId);
+      if (success) {
+        setBooks(prevBooks => prevBooks.filter(book => book.id !== bookId));
+        setTotalBooks(prev => prev - 1);
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('ru-RU', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        
+        const deletedBook = books.find(book => book.id === bookId);
+        if (deletedBook) {
+          const newActivity: BookActivity = {
+            id: `delete-${bookId}`,
+            time: timeString,
+            bookTitle: deletedBook.title,
+            author: deletedBook.author,
+            type: 'delete'
+          };
+
+          setRecentActivities(prev => [newActivity, ...prev].slice(0, 5));
+        }
+        
+        alert('Книга успешно удалена!');
+      }
+    } catch (error) {
+      console.error('Error deleting book:', error);
+      alert('Произошла ошибка при удалении книги');
+    }
+  };
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -129,25 +163,28 @@ export default function LibrarianDashboard() {
           </div>
           <div className={styles.statCard}>
             <h3>Добавлено сегодня</h3>
-            <p>{recentActivities.length}</p>
+            <p>{recentActivities.filter(activity => !activity.type || activity.type === 'add').length}</p>
           </div>
         </div>
 
         <section className={styles.section}>
-          <h2>Последние добавленные книги</h2>
+          <h2>Последние действия</h2>
           <div className={styles.activityList}>
             {recentActivities.length > 0 ? (
               recentActivities.map(activity => (
                 <div key={activity.id} className={styles.activityItem}>
                   <span className={styles.activityTime}>{activity.time}</span>
                   <span className={styles.activityText}>
-                    Добавлена книга: "{activity.bookTitle}" ({activity.author})
+                    {activity.type === 'delete' 
+                      ? `Удалена книга: "${activity.bookTitle}" (${activity.author})`
+                      : `Добавлена книга: "${activity.bookTitle}" (${activity.author})`
+                    }
                   </span>
                 </div>
               ))
             ) : (
               <div className={styles.noActivities}>
-                Сегодня книги ещё не добавлялись
+                Действий пока не было
               </div>
             )}
           </div>
@@ -162,6 +199,33 @@ export default function LibrarianDashboard() {
             >
               Добавить книгу
             </button>
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <h2>Список книг</h2>
+          <div className={styles.booksList}>
+            {books.length > 0 ? (
+              books.map(book => (
+                <div key={book.id} className={styles.bookItem}>
+                  <div className={styles.bookInfo}>
+                    <span className={styles.bookTitle}>{book.title}</span>
+                    <span className={styles.bookAuthor}>{book.author}</span>
+                  </div>
+                  <button
+                    className={styles.deleteBookButton}
+                    onClick={() => handleDeleteBook(book.id)}
+                    title="Удалить книгу"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className={styles.noBooks}>
+                В библиотеке пока нет книг
+              </div>
+            )}
           </div>
         </section>
       </main>
