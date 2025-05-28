@@ -23,7 +23,7 @@ export default function Libraries() {
               key={library.id}
               href={user 
                 ? `/catalog?library=${library.id}`
-                : `/register?library=${library.id}`}
+                : `/login?library=${library.id}`}
               className={styles.libraryCard}
             >
               <h2 className={styles.libraryName}>{library.name}</h2>
