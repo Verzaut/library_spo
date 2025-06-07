@@ -42,11 +42,13 @@ export default function Login() {
       // В реальном приложении здесь должен быть запрос к API
       // Сейчас сделаем простую имитацию для демонстрации
       if (loginData.email && loginData.password) {
+        // Имитируем получение данных с сервера
+        const [emailName] = loginData.email.split('@');
         // Создаем объект пользователя
         const userData = {
           id: Date.now().toString(),
-          firstName: 'Пользователь', // В реальном приложении это придет с сервера
-          lastName: '',
+          firstName: emailName.charAt(0).toUpperCase() + emailName.slice(1), // Используем часть email как имя
+          lastName: 'Читатель', // В реальном приложении это придет с сервера
           email: loginData.email,
           role: 'visitor' as const,
         };

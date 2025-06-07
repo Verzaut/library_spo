@@ -22,8 +22,8 @@ export default function LibrarianLogin() {
       // Создаем объект пользователя-библиотекаря
       const librarianData = {
         id: 'librarian-1',
-        firstName: 'Библиотекарь',
-        lastName: '',
+        firstName: 'Иван',
+        lastName: 'Петров',
         email: 'librarian@library.com',
         role: 'librarian' as const,
         libraryId: 'main-library'
