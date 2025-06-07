@@ -8,7 +8,9 @@ export default function Navigation() {
   const { user, logout } = useAuth();
 
   // Не показываем навигацию для библиотекаря
-  
+  if (user?.role === 'librarian') {
+    return null;
+  }
 
   return (
     <nav className={styles.navigation}>

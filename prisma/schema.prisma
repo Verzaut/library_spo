@@ -13,3 +13,39 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Librarian {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  firstName  String
+  lastName   String
+  libraryId  String
+  role       String   @default("librarian")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Reader {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  address   String?
+  role      String   @default("reader")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

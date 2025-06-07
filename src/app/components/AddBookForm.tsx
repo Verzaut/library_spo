@@ -3,8 +3,7 @@
 import { FormEvent, useState } from 'react';
 import styles from './AddBookForm.module.css';
 
-type AddBookFormProps = {
-  onClose: () => void;
+interface AddBookFormProps {
   onSubmit: (bookData: {
     title: string;
     author: string;
@@ -12,31 +11,28 @@ type AddBookFormProps = {
     genre: string;
     description: string;
   }) => void;
-};
+  onCancel: () => void;
+}
 
-export default function AddBookForm({ onClose, onSubmit }: AddBookFormProps) {
+export default function AddBookForm({ onSubmit, onCancel }: AddBookFormProps) {
   const [formData, setFormData] = useState({
     title: '',
     author: '',
-    year: '',
+    year: new Date().getFullYear(),
     genre: '',
     description: ''
   });
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      ...formData,
-      year: parseInt(formData.year)
-    });
-    onClose();
+    onSubmit(formData);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'year' ? parseInt(value) || new Date().getFullYear() : value
     }));
   };
 
@@ -45,7 +41,7 @@ export default function AddBookForm({ onClose, onSubmit }: AddBookFormProps) {
       <div className={styles.modal}>
         <div className={styles.modalHeader}>
           <h2>Добавить новую книгу</h2>
-          <button onClick={onClose} className={styles.closeButton}>×</button>
+          <button onClick={onCancel} className={styles.closeButton}>×</button>
         </div>
         
         <form onSubmit={handleSubmit} className={styles.form}>
@@ -86,7 +82,6 @@ export default function AddBookForm({ onClose, onSubmit }: AddBookFormProps) {
               required
               min="1800"
               max={new Date().getFullYear()}
-              placeholder="Введите год издания"
             />
           </div>
 
@@ -117,9 +112,6 @@ export default function AddBookForm({ onClose, onSubmit }: AddBookFormProps) {
           </div>
 
           <div className={styles.buttonGroup}>
-            <button type="button" onClick={onClose} className={styles.cancelButton}>
-              Отмена
-            </button>
             <button type="submit" className={styles.submitButton}>
               Добавить
             </button>

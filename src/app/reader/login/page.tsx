@@ -1,17 +1,18 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import styles from './page.module.css';
 
-export default function LibrarianLogin() {
+export default function ReaderLogin() {
   const router = useRouter();
   const { login } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   });
 
@@ -21,7 +22,7 @@ export default function LibrarianLogin() {
     setError('');
     
     try {
-      const response = await fetch('/api/auth/librarian', {
+      const response = await fetch('/api/auth/reader', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,7 +38,7 @@ export default function LibrarianLogin() {
 
       // Вход успешен
       login(data);
-      router.push('/librarian/dashboard');
+      router.push('/reader/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Произошла ошибка при входе');
     } finally {
@@ -58,21 +59,21 @@ export default function LibrarianLogin() {
     <div className={styles.container}>
       <main className={styles.main}>
         <div className={styles.formWrapper}>
-          <h1 className={styles.title}>Вход для библиотекарей</h1>
+          <h1 className={styles.title}>Вход для читателей</h1>
           
           <form onSubmit={handleSubmit} className={styles.form}>
             {error && <div className={styles.error}>{error}</div>}
             
             <div className={styles.inputGroup}>
-              <label htmlFor="username">Имя пользователя</label>
+              <label htmlFor="email">Email</label>
               <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
                 required
-                placeholder="Введите имя пользователя"
+                placeholder="Введите email"
               />
             </div>
 
@@ -96,6 +97,10 @@ export default function LibrarianLogin() {
             >
               {loading ? 'Вход...' : 'Войти'}
             </button>
+
+            <div className={styles.registerLink}>
+              <p>Нет аккаунта? <Link href="/reader/register">Зарегистрироваться</Link></p>
+            </div>
           </form>
         </div>
       </main>

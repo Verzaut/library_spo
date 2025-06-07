@@ -56,7 +56,6 @@ export default function LibrarianDashboard() {
     };
   }, [user, router]);
 
-  // Если идет загрузка, показываем индикатор загрузки
   if (isLoading) {
     return (
       <div className={styles.container}>
@@ -65,7 +64,6 @@ export default function LibrarianDashboard() {
     );
   }
 
-  // Если пользователь не авторизован или не является библиотекарем, не показываем содержимое
   if (!user || user.role !== 'librarian') {
     return null;
   }
@@ -160,12 +158,9 @@ export default function LibrarianDashboard() {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1>Панель управления библиотекаря</h1>
-        <div className={styles.userInfo}>
-          <span>{user.firstName}</span>
-          <button onClick={handleLogout} className={styles.logoutButton}>
-            Выйти
-          </button>
-        </div>
+        <button onClick={handleLogout} className={styles.logoutButton}>
+          Выйти
+        </button>
       </header>
 
       <main className={styles.main}>
@@ -204,73 +199,62 @@ export default function LibrarianDashboard() {
         </section>
 
         <section className={styles.section}>
-          <h2>Управление каталогом</h2>
-          <div className={styles.actionButtons}>
+          <div className={styles.sectionHeader}>
+            <h2>Управление книгами</h2>
             <button 
-              className={styles.actionButton}
               onClick={() => setShowAddBookForm(true)}
+              className={styles.addButton}
             >
               Добавить книгу
             </button>
           </div>
-        </section>
 
-        <section className={styles.section}>
-          <h2>Список книг</h2>
-          <div className={styles.booksList}>
-            {books.length > 0 ? (
-              books.map(book => (
-                <div key={book.id} className={styles.bookItem}>
-                  <div className={styles.bookInfo}>
-                    <span className={styles.bookTitle}>{book.title}</span>
-                    <span className={styles.bookAuthor}>{book.author}</span>
-                  </div>
-                  <button
-                    className={styles.deleteBookButton}
-                    onClick={() => handleDeleteClick(book.id, book.title)}
-                  >
-                    Удалить
-                  </button>
-                </div>
-              ))
-            ) : (
-              <div className={styles.noBooks}>
-                В библиотеке пока нет книг
+          {showAddBookForm && (
+            <div className={styles.modal}>
+              <div className={styles.modalContent}>
+                <AddBookForm 
+                  onSubmit={handleAddBook}
+                  onCancel={() => setShowAddBookForm(false)}
+                />
               </div>
-            )}
+            </div>
+          )}
+
+          <div className={styles.bookList}>
+            {books.map(book => (
+              <div key={book.id} className={styles.bookItem}>
+                <div className={styles.bookInfo}>
+                  <h3>{book.title}</h3>
+                  <p>{book.author}</p>
+                </div>
+                <button
+                  onClick={() => handleDeleteClick(book.id, book.title)}
+                  className={styles.deleteButton}
+                >
+                  Удалить
+                </button>
+              </div>
+            ))}
           </div>
         </section>
-      </main>
 
-      {showAddBookForm && (
-        <AddBookForm
-          onClose={() => setShowAddBookForm(false)}
-          onSubmit={handleAddBook}
-        />
-      )}
-
-      {bookToDelete && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h3>Подтверждение удаления</h3>
-            <p>Вы действительно хотите удалить книгу "{bookToDelete.title}"?</p>
-            <div className={styles.modalButtons}>
-              <button 
-                className={`${styles.modalButton} ${styles.confirmButton}`}
-                onClick={handleConfirmDelete}
-              >
-                Да, удалить
-              </button>
-              <button 
-                className={`${styles.modalButton} ${styles.cancelButton}`}
-                onClick={handleCancelDelete}
-              >
-                Отмена
-              </button>
+        {bookToDelete && (
+          <div className={styles.modal}>
+            <div className={styles.modalContent}>
+              <h2>Подтверждение удаления</h2>
+              <p>Вы уверены, что хотите удалить книгу "{bookToDelete.title}"?</p>
+              <div className={styles.modalButtons}>
+                <button onClick={handleConfirmDelete} className={styles.deleteButton}>
+                  Удалить
+                </button>
+                <button onClick={handleCancelDelete} className={styles.cancelButton}>
+                  Отмена
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </main>
     </div>
   );
 } 
