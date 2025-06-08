@@ -23,9 +23,55 @@ export default function AddBookForm({ onSubmit, onCancel }: AddBookFormProps) {
     description: ''
   });
 
+  const [errors, setErrors] = useState({
+    title: '',
+    author: '',
+    year: '',
+    genre: '',
+    description: ''
+  });
+
+  const validateForm = () => {
+    const newErrors = {
+      title: '',
+      author: '',
+      year: '',
+      genre: '',
+      description: ''
+    };
+
+    if (!formData.title.trim()) {
+      newErrors.title = 'Название книги обязательно';
+    }
+
+    if (!formData.author.trim()) {
+      newErrors.author = 'Имя автора обязательно';
+    }
+
+    const currentYear = new Date().getFullYear();
+    if (formData.year < 1800 || formData.year > currentYear) {
+      newErrors.year = `Год должен быть между 1800 и ${currentYear}`;
+    }
+
+    if (!formData.genre.trim()) {
+      newErrors.genre = 'Жанр обязателен';
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = 'Описание обязательно';
+    } else if (formData.description.length < 20) {
+      newErrors.description = 'Описание должно содержать минимум 20 символов';
+    }
+
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error !== '');
+  };
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (validateForm()) {
+      onSubmit(formData);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -34,14 +80,25 @@ export default function AddBookForm({ onSubmit, onCancel }: AddBookFormProps) {
       ...prev,
       [name]: name === 'year' ? parseInt(value) || new Date().getFullYear() : value
     }));
+    // Clear error when user starts typing
+    if (errors[name as keyof typeof errors]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
   return (
-    <div className={styles.overlay}>
+    <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && onCancel()}>
       <div className={styles.modal}>
         <div className={styles.modalHeader}>
           <h2>Добавить новую книгу</h2>
-          <button onClick={onCancel} className={styles.closeButton}>×</button>
+          <button 
+            onClick={onCancel} 
+            className={styles.closeButton}
+            aria-label="Закрыть"
+          >×</button>
         </div>
         
         <form onSubmit={handleSubmit} className={styles.form}>
@@ -53,9 +110,10 @@ export default function AddBookForm({ onSubmit, onCancel }: AddBookFormProps) {
               name="title"
               value={formData.title}
               onChange={handleChange}
-              required
               placeholder="Введите название книги"
+              className={errors.title ? styles.errorInput : ''}
             />
+            {errors.title && <span className={styles.errorText}>{errors.title}</span>}
           </div>
 
           <div className={styles.inputGroup}>
@@ -66,9 +124,10 @@ export default function AddBookForm({ onSubmit, onCancel }: AddBookFormProps) {
               name="author"
               value={formData.author}
               onChange={handleChange}
-              required
               placeholder="Введите имя автора"
+              className={errors.author ? styles.errorInput : ''}
             />
+            {errors.author && <span className={styles.errorText}>{errors.author}</span>}
           </div>
 
           <div className={styles.inputGroup}>
@@ -79,10 +138,11 @@ export default function AddBookForm({ onSubmit, onCancel }: AddBookFormProps) {
               name="year"
               value={formData.year}
               onChange={handleChange}
-              required
               min="1800"
               max={new Date().getFullYear()}
+              className={errors.year ? styles.errorInput : ''}
             />
+            {errors.year && <span className={styles.errorText}>{errors.year}</span>}
           </div>
 
           <div className={styles.inputGroup}>
@@ -93,9 +153,10 @@ export default function AddBookForm({ onSubmit, onCancel }: AddBookFormProps) {
               name="genre"
               value={formData.genre}
               onChange={handleChange}
-              required
               placeholder="Введите жанр книги"
+              className={errors.genre ? styles.errorInput : ''}
             />
+            {errors.genre && <span className={styles.errorText}>{errors.genre}</span>}
           </div>
 
           <div className={styles.inputGroup}>
@@ -105,15 +166,19 @@ export default function AddBookForm({ onSubmit, onCancel }: AddBookFormProps) {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              required
               placeholder="Введите описание книги"
               rows={4}
+              className={errors.description ? styles.errorInput : ''}
             />
+            {errors.description && <span className={styles.errorText}>{errors.description}</span>}
+            <span className={styles.charCount}>
+              {formData.description.length}/500 символов
+            </span>
           </div>
 
           <div className={styles.buttonGroup}>
             <button type="submit" className={styles.submitButton}>
-              Добавить
+              Добавить книгу
             </button>
           </div>
         </form>

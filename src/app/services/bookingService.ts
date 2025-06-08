@@ -1,12 +1,18 @@
+export type BookStatus = 'active' | 'returned' | 'overdue';
+
 export type BookedBook = {
   id: string;
   title: string;
   author: string;
   bookingDate: Date;
   returnDate: Date;
-  status: 'active' | 'returned' | 'overdue';
+  status: BookStatus;
   userId: string;
 };
+
+function isValidBookStatus(status: string): status is BookStatus {
+  return ['active', 'returned', 'overdue'].includes(status);
+}
 
 class BookingService {
   private readonly STORAGE_KEY = 'booked_books';
@@ -110,11 +116,21 @@ class BookingService {
     if (!booksJson) return [];
 
     const books = JSON.parse(booksJson);
-    return books.map((book: any) => ({
-      ...book,
-      bookingDate: new Date(book.bookingDate),
-      returnDate: new Date(book.returnDate)
-    }));
+    return books.map((book: any): BookedBook => {
+      if (!isValidBookStatus(book.status)) {
+        throw new Error(`Invalid book status: ${book.status}`);
+      }
+
+      return {
+        id: book.id,
+        title: book.title,
+        author: book.author,
+        status: book.status,
+        bookingDate: new Date(book.bookingDate),
+        returnDate: new Date(book.returnDate),
+        userId: book.userId
+      };
+    });
   }
 
   private saveBooks(books: BookedBook[]): void {

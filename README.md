@@ -1,36 +1,149 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Система управления библиотекой
 
-## Getting Started
+## Описание проекта
+Веб-приложение для управления библиотечным фондом, разработанное с использованием современных технологий. Система позволяет автоматизировать процессы учета книг, работу с читателями и управление библиотечным фондом.
 
-First, run the development server:
+## Функциональные возможности
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Для библиотекарей
+- Управление каталогом книг (добавление, редактирование, удаление)
+- Отслеживание статуса книг (доступна, забронирована, выдана)
+- Просмотр истории операций
+- Управление читательскими билетами
+- Формирование отчетов
+
+### Для читателей
+- Просмотр каталога книг
+- Поиск книг по различным параметрам
+- Бронирование книг
+- Просмотр истории заказов
+- Система рейтингов и отзывов
+
+## Технический стек
+
+### Frontend
+- Next.js
+- React
+- TypeScript
+- CSS Modules
+
+### Backend
+- Node.js
+- PostgreSQL (база данных)
+- localStorage (для демо-версии)
+
+## Структура проекта
+
+```
+library_spo/
+├── src/
+│   ├── app/
+│   │   ├── components/      # React компоненты
+│   │   ├── services/        # Сервисы для работы с данными
+│   │   ├── context/         # React контексты
+│   │   ├── librarian/      # Страницы администратора
+│   │   └── catalog/        # Страницы каталога
+│   ├── styles/             # Глобальные стили
+│   └── types/              # TypeScript типы
+├── public/                 # Статические файлы
+└── package.json           # Зависимости проекта
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Модули системы
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### BookService
+Модуль управления книгами:
+- Добавление новых книг
+- Обновление информации
+- Удаление книг
+- Поиск по каталогу
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### BookingService
+Модуль бронирования:
+- Бронирование книг
+- Возврат книг
+- Отслеживание сроков
+- Статистика пользователя
 
-## Learn More
+### AuthService
+Модуль аутентификации:
+- Регистрация пользователей
+- Авторизация
+- Управление ролями
+- Сессии пользователей
 
-To learn more about Next.js, take a look at the following resources:
+## Установка и запуск
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Требования
+- Node.js 18+
+- PostgreSQL 17+
+- npm или yarn
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Шаги установки
 
-## Deploy on Vercel
+1. Клонирование репозитория:
+```bash
+git clone [URL репозитория]
+cd library_spo
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. Установка зависимостей:
+```bash
+npm install
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. Настройка базы данных:
+```bash
+createdb -U postgres library_db
+```
+
+4. Запуск приложения:
+```bash
+npm run dev
+```
+
+## Работа с системой
+
+### Вход в систему
+- Для библиотекарей: `/librarian/login`
+- Для читателей: `/login`
+
+### Основные операции
+
+#### Добавление книги
+1. Войти как библиотекарь
+2. Перейти в раздел "Управление книгами"
+3. Нажать "Добавить книгу"
+4. Заполнить форму с информацией о книге
+
+#### Бронирование книги
+1. Войти как читатель
+2. Найти книгу в каталоге
+3. Нажать "Забронировать"
+4. Подтвердить бронирование
+
+## Безопасность
+- Разграничение прав доступа по ролям
+- Защита от несанкционированного доступа
+- Валидация данных на клиенте и сервере
+- Безопасное хранение паролей
+
+## Масштабирование
+Система спроектирована с учетом возможности масштабирования:
+- Модульная архитектура
+- Независимые сервисы
+- Возможность добавления новых функций
+
+## Поддержка и обновление
+- Регулярные обновления безопасности
+- Добавление новых функций
+- Оптимизация производительности
+- Исправление ошибок
+
+## Контакты
+По вопросам поддержки и развития проекта обращаться:
+- Email: [email]
+- Телефон: [телефон]
+
+## Лицензия
+[Тип лицензии]
